@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Annotating WPT to Surface the Status of the Platform</title>
+
+		<link rel="stylesheet" href="dist/reset.css">
+		<link rel="stylesheet" href="dist/reveal.css">
+		<link rel="stylesheet" href="dist/theme/serif.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="plugin/highlight/monokai.css">
+		<style>
+.reveal a { color: #a00; }
+.reveal figure img {
+  margin: 0;
+}
+.reveal figure cite {
+  display: block;
+
+  font-size: 0.3em;
+  text-align: right;
+}
+.reveal .license {
+  font-size: 0.3em;
+}
+.reveal .license img {
+  margin: 0;
+}
+.reveal .avatar {
+  height: 0.8em;
+  margin: 0 0.2em;
+}
+.reveal section:has(h2 + h3) {
+  text-align: left;
+}
+.reveal section h2:has(+ h3) {
+  font-size: 0.6em;
+  margin-bottom: 0;
+}
+.reveal section h2 + h3 {
+  font-size: 1.3em;
+}
+</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-markdown data-separator-notes="^Note:">
+					<textarea data-template>
+## Annotating WPT to Surface the Status of the Platform
+
+[W3C TPAC](https://www.w3.org/2025/11/TPAC), 2025-11-11
+
+<p class="license">
+  Except where noted, this presentation is licensed via
+  <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+  CC BY SA 4.0 <img alt="Creative Commons License" style="border-width:0" src="cc-by-sa-4.0.png"></a>
+<p>
+
+---
+
+## Hello!
+
+<img class="r-stretch" src="bob-bust.png" alt="The Bocoup logo: a cartoon rendering of a rooster" />
+
+[Bocoup](https://bocoup.com), a worker-owned tech consultancy  
+<img class="avatar" alt="A 16-bit rendering of the video game character Mega Man--the image Mike often uses as an avatar" src="megaman.png">[Mike Pennisi](https://mikepennisi.com) (he/him), a worker-owner
+
+---
+
+## Outline
+
+I. Intro to web-features  
+II. Crash-course in WPT test annotation  
+III. Go forth and classify!  
+IV. Discussion: what does it mean to fail this test?
+
+---
+
+## I. Intro to web-features
+
+---
+
+## I. Intro to web-features
+
+### Motivation
+
+**High level**: promote understanding of the web platform--both its scope and
+its availability
+
+**Practically speaking**: power
+[MDN](https://developer.mozilla.org/en-US/docs/Glossary/Baseline/Compatibility),
+[Can I Use](https://caniuse.com/), [webstatus.dev](https://webstatus.dev), and
+[Baseline](https://web-platform-dx.github.io/web-features/) (among [many other
+projects](https://web-platform-dx.github.io/web-features/baseline-in-the-wild/))
+
+...for more, see "[web-features and
+Baseline](https://www.youtube.com/watch?v=QzfwNFIXOkM)" [2025] (14min) by
+Patrick Brosset
+([slides](https://www.w3.org/2025/Talks/AC/web-features-patrick-brosset/))
+
+Note:
+
+- among developers - to increase confidence in commiting and to surface
+  opportunities for advocacy
+- among implementers - to prioritize effort
+
+---
+
+## I. Intro to web-features
+
+### Status in test annotation
+
+[Incorporated into Test262 as of November,
+2025.](https://github.com/tc39/test262/pull/4599)
+
+Final push for WPT currently underway.
+
+---
+
+## II. Crash-course in WPT test annotation
+
+---
+
+## II. Crash-course in WPT test annotation
+
+### Anatomy of a `WEB_FEATURES.YML` file
+
+<small>[`css/css-values/WEB_FEATURES.yml`](https://github.com/web-platform-tests/wpt/blob/master/css/css-values/WEB_FEATURES.yml):</small>
+
+```yml
+# `.gitignore` semantics - https://git-scm.com/docs/gitignore
+features:
+- name: calc
+  files:
+  - calc-*
+  - "!calc-infinity-*"
+- name: calc-constants
+  files:
+  - calc-infinity-*
+```
+
+<small>[`mediasession/WEB_FEATURES.yml`](https://github.com/web-platform-tests/wpt/blob/master/mediasession/WEB_FEATURES.yml):</small>
+
+```yml
+features:
+- name: media-session
+  # The special value `"**"` means "all tests in this directory
+  # and all subdirectories"
+  files: "**"
+```
+
+Note:
+
+The "files" property can be specified as a list of string values (where each
+value is a "glob" pattern used to match against the files in the same
+directory) or the string value `"**"`.
+
+---
+
+## II. Crash-course in WPT test annotation
+
+### Considerations: cross-cutting tests
+
+Designed for the sake of convenience
+
+```html
+<!-- etc. -->
+<article aria-label="label" data-expectedlabel="label" data-testname="label valid on article element" class="ex">x</article>
+<aside aria-label="label" data-expectedlabel="label" data-testname="label valid on aside element" class="ex">x</aside>
+<blockquote aria-label="label" data-expectedlabel="label" data-testname="label valid on blockquote element" class="ex">x</blockquote>
+<button aria-label="label" data-expectedlabel="label" data-testname="label valid on button element" class="ex">x</button>
+<dl aria-label="label" data-expectedlabel="label" data-testname="label valid on dl element" class="ex">
+<!-- etc. -->
+```
+
+Designed due to necessity
+
+```css
+.test {
+  border-radius: 10px;
+  box-shadow: 0 0 0 10px;
+  width: 40px; height: 40px;
+}
+```
+
+Note:
+
+When tests cover multiple features as a convenience to the test author, the
+best solution is often to refactor the tests.
+
+When tests explicitly verify the confluence of features, it's not always clear
+whether failures can be attributed to one or more features.
+
+For our initial work, we've prioritized building a partial definition with the
+expectation that nuanced decisions can be made following future conversations
+on a feature-by-feature basis.
+
+---
+
+### Considerations: trade-offs to pattern matching
+
+Strength: flexibility (e.g. `box-shadow-024.htm` or `comp_tooltip.tentative.html`)
+
+Weakness: 
+
+Note:
+
+---
+
+## III. Go forth and classify!
+
+- author tests to support classification (and ideally, verify their classification)
+- update tests to improve classifiability
+- [prototype](https://web-platform-tests.org/writing-tests/file-names.html) new
+  features directly in WPT via `WEB_FEATURES.tentative.yml`
+- [propose new features to the CG](https://github.com/web-platform-dx/web-features/blob/main/docs/CONTRIBUTING.md)
+- get involved in conversations about reporting on feature integration
+
+---
+
+## VI. Brainstorming
+
+---
+
+## VI. Brainstorming
+
+### How do we promote maintenance?
+
+- Current solution
+- One idea
+
+---
+
+## VI. Brainstorming
+
+### What does it mean to fail this test?
+
+```html
+<!DOCTYPE html>
+<title>Box Shadow Border Radius (Outset)</title>
+<link rel="author" title="Elika J. Etemad" href="http://fantasai.inkedblade.net/contact">
+<link rel="help" href="https://www.w3.org/TR/css-backgrounds-3/#shadow-shape">
+<link rel="match" href="box-shadow-radius-000-ref.html">
+<meta name="fuzzy" content="0-25;0-90">
+<style>
+  .test {
+    border-radius: 10px;
+    box-shadow: 0 0 0 10px;
+    top: 30px; left: 30px;
+    width: 40px; height: 40px;
+  }
+</style>
+<div class="test"></div>
+```
+
+---
+
+## Thanks!
+
+<img class="avatar" alt="A 16-bit rendering of the video game character Mega Man--the image Mike often uses as an avatar" src="megaman.png">Mike Pennisi (he/him), [mike@bocoup.com](mailto:mike@bocoup.com)
+					</textarea>
+				</section>
+			</div>
+		</div>
+
+		<script src="dist/reveal.js"></script>
+		<script src="plugin/notes/notes.js"></script>
+		<script src="plugin/markdown/markdown.js"></script>
+		<script src="plugin/highlight/highlight.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				hash: true,
+				slideNumber: 'c/t',
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+			});
+		</script>
+	</body>
+</html>
