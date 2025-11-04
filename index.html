@@ -169,11 +169,11 @@ Designed for the sake of convenience
 
 ```html
 <!-- etc. -->
-<article aria-label="label" data-expectedlabel="label" data-testname="label valid on article element" class="ex">x</article>
-<aside aria-label="label" data-expectedlabel="label" data-testname="label valid on aside element" class="ex">x</aside>
-<blockquote aria-label="label" data-expectedlabel="label" data-testname="label valid on blockquote element" class="ex">x</blockquote>
-<button aria-label="label" data-expectedlabel="label" data-testname="label valid on button element" class="ex">x</button>
-<dl aria-label="label" data-expectedlabel="label" data-testname="label valid on dl element" class="ex">
+<article aria-label="label" data-expectedlabel="label" data-testname="label valid on article element">x</article>
+<aside aria-label="label" data-expectedlabel="label" data-testname="label valid on aside element">x</aside>
+<blockquote aria-label="label" data-expectedlabel="label" data-testname="label valid on blockquote element">x</blockquote>
+<button aria-label="label" data-expectedlabel="label" data-testname="label valid on button element">x</button>
+<dl aria-label="label" data-expectedlabel="label" data-testname="label valid on dl element">
 <!-- etc. -->
 ```
 
@@ -201,13 +201,24 @@ on a feature-by-feature basis.
 
 ---
 
+## II. Crash-course in WPT test annotation
+
 ### Considerations: trade-offs to pattern matching
 
 Strength: flexibility (e.g. `box-shadow-024.htm` or `comp_tooltip.tentative.html`)
 
-Weakness: 
+Weakness: unintentional matching
 
 Note:
+
+Pattern matching allows classifiers to be resilient to expected changes in
+directory contents. This often occurs when file names have predictable file
+names regarding their intent, membership in a sequence, or tentative status.
+
+On the other hand, new contributions can unintentionally match existing
+classifiers. In the best case, contributors recognize these situations and take
+on the extra effort to preserve accuracy. In the worst case, the mistake goes
+unnoticed, degrading the quality of the classifier.
 
 ---
 
@@ -230,8 +241,24 @@ Note:
 
 ### How do we promote maintenance?
 
-- Current solution
-- One idea
+Current solution: scheduled task in external repository periodically alerts
+the maintainers of the web-features project.
+
+TODO: screen shot of automated pull request
+
+Note:
+
+In the current solution, contributors and reviewers may be unaware of the
+impact that a given patch has on the web-features project.
+
+---
+
+One idea: task in WPT immediately alerts contributors/reviewers
+
+- X changes to web-features classifications
+  - X new tests unclassified
+  - X new tests classified
+  - X existing tests classification changed
 
 ---
 
@@ -256,6 +283,15 @@ Note:
 </style>
 <div class="test"></div>
 ```
+
+Note:
+
+When a test for the interaction of features fails, it may not reflect a lack of
+support for both. Consider a browser fully supports CSS animations but does not
+yet support box-shadow. When it fails a test for animating a shadow, should
+that impact its support metrics for animation? Is there room for nuance in the
+way feature support can be reported? And if so, what changes might be needed to
+the classification schema?
 
 ---
 
