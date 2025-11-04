@@ -117,7 +117,7 @@ Note:
 [Incorporated into Test262 as of November,
 2025.](https://github.com/tc39/test262/pull/4599)
 
-Final push for WPT currently underway.
+Initial coverage for WPT currently underway.
 
 ---
 
@@ -229,7 +229,6 @@ unnoticed, degrading the quality of the classifier.
 - [prototype](https://web-platform-tests.org/writing-tests/file-names.html) new
   features directly in WPT via `WEB_FEATURES.tentative.yml`
 - [propose new features to the CG](https://github.com/web-platform-dx/web-features/blob/main/docs/CONTRIBUTING.md)
-- get involved in conversations about reporting on feature integration
 
 ---
 
@@ -241,19 +240,25 @@ unnoticed, degrading the quality of the classifier.
 
 ### How do we promote maintenance?
 
-Current solution: scheduled task in external repository periodically alerts
-the maintainers of the web-features project.
+![An automated pull request to the web-features repository](web-features-pull-request.png)
 
-TODO: screen shot of automated pull request
+Source: https://github.com/web-platform-dx/web-features/issues/3399
 
 Note:
+
+Current solution: scheduled task in external repository periodically alerts
+the maintainers of the web-features project.
 
 In the current solution, contributors and reviewers may be unaware of the
 impact that a given patch has on the web-features project.
 
 ---
 
-One idea: task in WPT immediately alerts contributors/reviewers
+## VI. Brainstorming
+
+### How do we promote maintenance?
+
+Perhaps a task in WPT could immediately alert contributors & reviewers, e.g.
 
 - X changes to web-features classifications
   - X new tests unclassified
@@ -267,28 +272,27 @@ One idea: task in WPT immediately alerts contributors/reviewers
 ### What does it mean to fail this test?
 
 ```html
-<!DOCTYPE html>
-<title>Box Shadow Border Radius (Outset)</title>
-<link rel="author" title="Elika J. Etemad" href="http://fantasai.inkedblade.net/contact">
-<link rel="help" href="https://www.w3.org/TR/css-backgrounds-3/#shadow-shape">
-<link rel="match" href="box-shadow-radius-000-ref.html">
-<meta name="fuzzy" content="0-25;0-90">
-<style>
-  .test {
-    border-radius: 10px;
-    box-shadow: 0 0 0 10px;
-    top: 30px; left: 30px;
-    width: 40px; height: 40px;
-  }
-</style>
-<div class="test"></div>
+<script>
+test_interpolation({
+  property: 'text-shadow',
+  from: neutralKeyframe,
+  to: 'green 20px 20px 20px',
+}, [
+  {at: -0.3, expect: 'rgb(255, 176, 0) 7px 33px 7px'},
+  {at: 0, expect: 'rgb(255, 165, 0) 10px 30px 10px'},
+  {at: 0.3, expect: 'rgb(179, 154, 0) 13px 27px 13px'},
+  {at: 0.6, expect: 'rgb(102, 143, 0) 16px 24px 16px'},
+  {at: 1, expect: 'rgb(0, 128, 0) 20px 20px 20px'},
+  {at: 1.5, expect: 'rgb(0, 110, 0) 25px 15px 25px'},
+]);
+</script>
 ```
 
 Note:
 
 When a test for the interaction of features fails, it may not reflect a lack of
 support for both. Consider a browser fully supports CSS animations but does not
-yet support box-shadow. When it fails a test for animating a shadow, should
+yet support text-shadow. When it fails a test for animating a shadow, should
 that impact its support metrics for animation? Is there room for nuance in the
 way feature support can be reported? And if so, what changes might be needed to
 the classification schema?
@@ -313,6 +317,7 @@ the classification schema?
 			// - https://revealjs.com/config/
 			Reveal.initialize({
 				hash: true,
+				showNotes: true,
 				slideNumber: 'c/t',
 				// Learn about plugins: https://revealjs.com/plugins/
 				plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
